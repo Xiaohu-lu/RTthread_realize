@@ -1,12 +1,12 @@
 /**************************************************************************//**
  * @file     system_ARMCM3.c
  * @brief    CMSIS Device System Source File for
- *           ARMCM3 Device
- * @version  V1.0.1
- * @date     15. November 2019
+ *           ARMCM3 Device Series
+ * @version  V5.00
+ * @date     10. January 2018
  ******************************************************************************/
 /*
- * Copyright (c) 2009-2019 Arm Limited. All rights reserved.
+ * Copyright (c) 2009-2018 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -28,19 +28,22 @@
 /*----------------------------------------------------------------------------
   Define clocks
  *----------------------------------------------------------------------------*/
-#define  XTAL            (50000000UL)     /* Oscillator frequency */
+#define  XTAL            ( 5000000UL)      /* Oscillator frequency */
 
-#define  SYSTEM_CLOCK    (XTAL / 2U)
+#define  SYSTEM_CLOCK    (5U * XTAL)
+
 
 /*----------------------------------------------------------------------------
-  Exception / Interrupt Vector table
+  Externals
  *----------------------------------------------------------------------------*/
-extern const VECTOR_TABLE_Type __VECTOR_TABLE[240];
+#if defined (__VTOR_PRESENT) && (__VTOR_PRESENT == 1U)
+  extern uint32_t __Vectors;
+#endif
 
 /*----------------------------------------------------------------------------
   System Core Clock Variable
  *----------------------------------------------------------------------------*/
-uint32_t SystemCoreClock = SYSTEM_CLOCK;  /* System Core Clock Frequency */
+uint32_t SystemCoreClock = SYSTEM_CLOCK;
 
 
 /*----------------------------------------------------------------------------
@@ -58,7 +61,7 @@ void SystemInit (void)
 {
 
 #if defined (__VTOR_PRESENT) && (__VTOR_PRESENT == 1U)
-  SCB->VTOR = (uint32_t) &(__VECTOR_TABLE[0]);
+  SCB->VTOR = (uint32_t) &__Vectors;
 #endif
 
   SystemCoreClock = SYSTEM_CLOCK;

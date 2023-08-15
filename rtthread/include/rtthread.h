@@ -14,6 +14,21 @@ struct rt_thread
 };
 typedef struct rt_thread *rt_thread_t;
 
+/***********************thread.c函数声明*****************************************/
+rt_err_t rt_thread_init(struct rt_thread *thread,
+												void (*entry)(void *parameter),
+												void 						*parameter,
+												void 						*stack_start,
+												rt_uint32_t			stack_size);
 
+
+												
+												
+												
+/***********************scheduler.c函数声明*****************************************/												
+void rt_system_scheduler_init(void);
+void rt_system_scheduler_start(void);												
+void rt_schedule(void);											
+												
 #endif
 

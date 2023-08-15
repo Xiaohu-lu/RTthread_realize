@@ -58,5 +58,18 @@ typedef struct rt_list_node rt_list_t;
 
 
 
+/***************************¥ÌŒÛ¬Î∂®“Â**************************************/
+#define	RT_EOK							0				/*there is no error*/
+#define RT_ERROR						1				/*a generic error happens*/
+#define RT_ETIMEOUT					2				/*Time out*/
+#define RT_EFULL						3				/*the resource is full*/
+#define RT_EEMPTY						4				/*the resource is empty*/
+#define RT_NOMEM						5				/*no memory*/
+#define RT_ENOSYS						6				/*no system*/
+#define RT_EBUSY						7				/*busy*/
+#define RT_EIO							8				/*IO error*/
+#define RT_EINTR						9				/*Interrrupted system call*/
+#define RT_EINVAL						10			/*Invalid argument*/
+
 #endif
 

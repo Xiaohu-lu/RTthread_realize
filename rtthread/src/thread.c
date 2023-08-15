@@ -1,4 +1,11 @@
 #include "rtthread.h"
+#include "rtservice.h"
+
+extern rt_uint8_t *rt_hw_stack_init(void				*tentry,
+																		void				*parameter,
+																		rt_uint8_t *stack_addr);
+
+
 
 /* rt_thread_init
  * 线程初始化函数

@@ -31,7 +31,26 @@ struct stack_frame
 };
 
 
+/* 用于存储上一个线程的栈的SP的指针
+ */
+rt_uint32_t rt_interrupt_from_thread;
 
+/* 用于存储下一个将要运行的线程的栈的sp的指针
+ */
+rt_uint32_t rt_interrupt_to_thread;
+
+/* PendSV中断服务函数执行标志
+ */
+rt_uint32_t rt_thread_switch_interrupt_flag;
+
+
+/* rt_hw_stack_init
+ * 初始化任务时,栈初始化
+ * tentry:		任务入口函数
+ * parameter:	任务形参
+ * stack_addr:任务栈顶地址-4
+ * return:		返回初始化后的栈顶地址add-16*4-8对齐
+ */
 rt_uint8_t *rt_hw_stack_init(void				*tentry,
 														 void				*parameter,
 														 rt_uint8_t *stack_addr)
