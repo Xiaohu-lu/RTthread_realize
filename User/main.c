@@ -64,6 +64,7 @@ int main(void)
 	/* 初始化线程
 	 */
 	rt_thread_init(&rt_flag1_thread,							/*线程句柄*/
+								 "f1_thread",										/*线程名称*/
 								 flag1_thread_entry,						/*线程入口地址*/
 								 RT_NULL,												/*线程形参*/
 								 &rt_flag1_thread_stack[0],			/*线程栈地址*/
@@ -73,6 +74,7 @@ int main(void)
 	rt_list_insert_before(&(rt_thread_priority_table[0]),&(rt_flag1_thread.tlist));
 	
 	rt_thread_init(&rt_flag2_thread,							/*线程句柄*/
+								 "f2_thread",										/*线程名称*/
 								 flag2_thread_entry,						/*线程入口地址*/
 								 RT_NULL,												/*线程形参*/
 								 &rt_flag2_thread_stack[0],			/*线程栈地址*/

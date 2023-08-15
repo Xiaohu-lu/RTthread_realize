@@ -217,10 +217,37 @@ _reswitch
 		
 		
 		
-		
-		
-		
-		
+;/*
+; *-----------------------------------------------------------------------------
+; * 函数原型：rt_base_t rt_hw_interrupt_disable(void);
+; * 
+; * 关中断
+; */		
+rt_hw_interrupt_disable		PROC
+	EXPORT	rt_hw_interrupt_disable
+	
+	MRS	r0,	PRIMASK	;1bit,1时只响应NMI,其他异常都不响应
+	CPSID	I		;关中断
+	;子程序返回
+	BX	LR
+	;函数返回值保存在r0中
+	;rt_hw_interrupt_disable子程序结束
+	ENDP
+	
+	
+;/*
+; *-----------------------------------------------------------------------------
+; * 函数原型：void rt_hw_interrupt_enable(rt_base_t level);
+; * 
+; * 开中断
+; */			
+rt_hw_interrupt_enable		PROC
+	EXPORT	rt_hw_interrupt_enable
+	
+	MSR	PRIMASK, r0	;将r0寄存器值加载到PRIMASK寄存器
+	BX	LR			;子程序返回
+	
+	ENDP			;子程序结束
 		
 		
 		

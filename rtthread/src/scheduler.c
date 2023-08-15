@@ -15,7 +15,7 @@
  */
 rt_list_t rt_thread_priority_table[RT_THREAD_PRIORITY_MAX];
 
-static rt_thread_t rt_current_thread;
+rt_thread_t rt_current_thread;
 
 /* rt_system_scheduler_init
  * 调度器初始化
@@ -66,14 +66,16 @@ void rt_system_scheduler_start(void)
  */
 void rt_schedule(void)
 {
-	struct rt_thread *to_thread;
+	struct rt_thread *to_thread;	
 	struct rt_thread *from_thread;
-	
+#if 0	
 	/* 两个线程轮流切换
 	 */
 	if(rt_current_thread == rt_list_entry(rt_thread_priority_table[0].next,struct rt_thread,tlist))
 	{
 		from_thread = rt_current_thread;
+		/* 需要改变,因为第一个成员不是SP指针了
+		 */
 		to_thread = rt_list_entry(rt_thread_priority_table[1].next,struct rt_thread,tlist);
 		rt_current_thread = to_thread;
 	}
@@ -83,7 +85,11 @@ void rt_schedule(void)
 		to_thread = rt_list_entry(rt_thread_priority_table[0].next,struct rt_thread,tlist);
 		rt_current_thread = to_thread;
 	}
+#else/*加入阻塞延时*/
 	
+#endif
+
+
 	/* 发起PendSV异常
 	 * 产生上下文切换
 	 */
