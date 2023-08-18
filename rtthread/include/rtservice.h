@@ -2,6 +2,16 @@
 #define __RTSERVICE_H__
 #include "rtdef.h"
 
+
+/* 已知一个结构体里面的成员的地址,反推出该结构体的首地址
+ */
+#define rt_container_of(ptr,type,member)	\
+				((type*)((char*)(ptr) - (unsigned long)(&((type*)0)->member)))
+					
+#define rt_list_entry(node,type,member)	rt_container_of(node,type,member)
+
+
+
 /* rt_list_init
  * 内联函数,链接节点初始化
  * l:	链表节点句柄
@@ -51,7 +61,14 @@ rt_inline void rt_list_remove(rt_list_t *n)
 	n->next = n->prev = n;
 }
 
-
+/* rt_list_isempty
+ * 判断链表是否为空
+ * n:		要判断链表的头
+ */
+rt_inline int rt_list_isempty(rt_list_t *n)
+{
+	return (n->next == n);
+}
 
 
 

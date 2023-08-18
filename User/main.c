@@ -2,8 +2,12 @@
 #include "rtconfig.h"
 #include "rtservice.h"
 #include "rtthread.h"
+#include "rthw.h"
 #include <stdint.h>
+#include "ARMCM3.h"
 
+
+extern uint32_t SystemCoreClock;
 ALIGN(RT_ALIGN_SIZE)
 /*定义线程栈*/
 rt_uint8_t rt_flag1_thread_stack[512];
@@ -27,6 +31,7 @@ void flag1_thread_entry(void *p_arg)
 {
 	for(;;)
 	{
+		#if 0
 		flag1 = 1;
 		delay(100);
 		flag1 = 0;
@@ -34,6 +39,12 @@ void flag1_thread_entry(void *p_arg)
 		/* 线程切换,这里手动切换
 		 */
 		rt_schedule();
+		#else
+		flag1 = 1;
+		rt_thread_delay(2);
+		flag1 = 0;
+		rt_thread_delay(2);
+		#endif
 	}
 }
 
@@ -41,6 +52,7 @@ void flag2_thread_entry(void *p_arg)
 {
 	for(;;)
 	{
+		#if 0
 		flag2 = 1;
 		delay(100);
 		flag2 = 0;
@@ -48,18 +60,31 @@ void flag2_thread_entry(void *p_arg)
 		/* 线程切换,这里手动切换
 		 */
 		rt_schedule();
+		#else
+		flag2 = 1;
+		rt_thread_delay(2);
+		flag2 = 0;
+		rt_thread_delay(2);
+		#endif
 	}
 }
-
+//#define  __Vendor_SysTickConfig			1
 extern rt_list_t rt_thread_priority_table[RT_THREAD_PRIORITY_MAX];
 int main(void)
 {
 	/* 硬件初始化
 	 */
+	rt_hw_interrupt_disable();/*关中断*/
+	/*SysTick中断频率设置*/
+	SysTick_Config(SystemCoreClock / RT_TICK_PER_SECOND);
 	
 	/* 调度器初始化
 	 */
 	rt_system_scheduler_init();
+	
+	/* 初始化空闲线程
+	 */
+	rt_thread_idle_init();
 	
 	/* 初始化线程
 	 */
@@ -68,21 +93,25 @@ int main(void)
 								 flag1_thread_entry,						/*线程入口地址*/
 								 RT_NULL,												/*线程形参*/
 								 &rt_flag1_thread_stack[0],			/*线程栈地址*/
-								 sizeof(rt_flag1_thread_stack));/*线程栈大小,单位字节*/	
+								 sizeof(rt_flag1_thread_stack), /*线程栈大小,单位字节*/	
+								 2);														/*线程优先级*/
 	/* 将线程插入到就绪列表
 	 */
-	rt_list_insert_before(&(rt_thread_priority_table[0]),&(rt_flag1_thread.tlist));
-	
+	//rt_list_insert_before(&(rt_thread_priority_table[0]),&(rt_flag1_thread.tlist));
+	rt_thread_startup(&rt_flag1_thread);
+								 
 	rt_thread_init(&rt_flag2_thread,							/*线程句柄*/
 								 "f2_thread",										/*线程名称*/
 								 flag2_thread_entry,						/*线程入口地址*/
 								 RT_NULL,												/*线程形参*/
 								 &rt_flag2_thread_stack[0],			/*线程栈地址*/
-								 sizeof(rt_flag2_thread_stack));/*线程栈大小,单位字节*/
+								 sizeof(rt_flag2_thread_stack), /*线程栈大小,单位字节*/
+								 3);														/*线程优先级*/
 	/* 将线程插入到就绪列表
 	 */
-	rt_list_insert_before(&(rt_thread_priority_table[1]),&(rt_flag2_thread.tlist));	
-	
+	//rt_list_insert_before(&(rt_thread_priority_table[1]),&(rt_flag2_thread.tlist));	
+	rt_thread_startup(&rt_flag2_thread);
+								 
 	/* 启动系统调度器
 	 */
 	rt_system_scheduler_start();

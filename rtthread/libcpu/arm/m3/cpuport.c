@@ -98,3 +98,4 @@ rt_uint8_t *rt_hw_stack_init(void				*tentry,
 	/*返回线程栈指针*/
 	return stk;
 }
+
