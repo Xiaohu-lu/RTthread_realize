@@ -18,6 +18,9 @@ struct rt_thread
 	void 				*stack_addr;				/*线程栈起始地址*/
 	rt_uint32_t stack_size;					/*线程栈大小，单位为字节*/
 	
+	rt_ubase_t  init_tick;					/*初始时间片*/
+	
+	
 	rt_ubase_t	remaining_tick;			/*用于实现阻塞延时*/
 	
 	rt_uint8_t	current_priority;		/*线程当前优先级*/
@@ -39,7 +42,8 @@ rt_err_t rt_thread_init(struct rt_thread *thread,
 												void 						*parameter,
 												void 						*stack_start,
 												rt_uint32_t			stack_size,
-												rt_uint8_t			priority);
+												rt_uint8_t			priority,
+												rt_uint32_t			tick);
 
 rt_err_t rt_thread_delay(rt_tick_t tick);
 rt_thread_t rt_thread_self(void);
