@@ -41,7 +41,7 @@ rt_err_t rt_thread_init(struct rt_thread *thread,
 												rt_uint32_t			stack_size,
 												rt_uint8_t			priority);
 
-void rt_thread_delay(rt_tick_t tick);
+rt_err_t rt_thread_delay(rt_tick_t tick);
 rt_thread_t rt_thread_self(void);
 rt_err_t rt_thread_resume(rt_thread_t thread);												
 rt_err_t rt_thread_startup(rt_thread_t thread);												
@@ -75,6 +75,35 @@ void rt_interrupt_leave(void);
 
 /***********************clock.c函数声明*****************************************/		
 rt_tick_t rt_tick_get(void);
+
+
+/***********************timer.c函数声明*****************************************/		
+void rt_system_timer_init(void);
+rt_err_t rt_timer_stop(rt_timer_t timer);
+rt_err_t rt_timer_control(rt_timer_t timer,int cmd,void *arg);
+rt_err_t rt_timer_start(rt_timer_t timer);
+
+void rt_timer_init(rt_timer_t timer,const char *name,void (*timeout)(void *parameter),void *parameter,rt_tick_t time,rt_uint8_t flag);
+
+void rt_timer_check(void);
+void rt_thread_timeout(void *parameter);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #endif
 

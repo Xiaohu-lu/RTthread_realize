@@ -189,6 +189,9 @@ struct rt_object_information
 
 #define RT_TIMER_SKIP_LIST_LEVEL		1				/**/
 
+#ifndef RT_TIMER_SKIP_LIST_MASK
+#define RT_TIMER_SKIP_LIST_MASK         0x3
+#endif
 
 #define RT_TICK_MAX									0xFFFFFFFF	/**/
 

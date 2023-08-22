@@ -42,13 +42,90 @@ rt_err_t rt_thread_init(struct rt_thread *thread,
 	/*错误码和状态*/
 	thread->error = RT_EOK;
 	thread->stat  = RT_THREAD_INIT;
+	/* 初始化线程定时器
+	 */
+	rt_timer_init(&(thread->thread_timer),	/*静态定时器对象*/
+								thread->name,							/*定时器名字,直接使用线程名*/
+								rt_thread_timeout,				/*超时函数*/
+								thread,										/*超时函数形参*/
+								0,												/*延时时间*/
+								RT_TIMER_FLAG_ONE_SHOT);	/*定时器的标志*/
 	return RT_EOK;
 }
+
+/* rt_thread_suspend
+ * 该函数用于挂起指定的线程
+ * 如果是挂起线程本身,在调用该函数后,
+ * 必须调用rt_schedule()进行系统调度
+ */
+rt_err_t rt_thread_suspend(rt_thread_t thread)
+{
+	register rt_base_t temp;
+	
+	/*只有就绪的线程才能被挂起,否则退出返回错误码*/
+	if((thread->stat & RT_THREAD_STAT_MASK) != RT_THREAD_READY)
+	{
+		return -RT_ERROR;
+	}
+	
+	/*关中断*/
+	temp = rt_hw_interrupt_disable();
+	
+	/*改变线程状态*/
+	thread->stat = RT_THREAD_SUSPEND;
+	
+	/*将线程从就绪列表中删除*/
+	rt_schedule_remove_thread(thread);
+	
+	/*停止线程定时器*/
+	rt_timer_stop(&(thread->thread_timer));
+	
+	/*开中断*/
+	rt_hw_interrupt_enable(temp);
+	
+	return RT_EOK;
+}
+
+
+
+/* rt_thread_sleep
+ * 该函数将让一个线程睡眠一段时间,单位为tick
+ */
+rt_err_t rt_thread_sleep(rt_tick_t tick)
+{
+	register rt_base_t temp;
+	struct rt_thread *thread;
+	
+	/*关中断*/
+	temp = rt_hw_interrupt_disable();
+	
+	/*获取当前线程的线程控制块*/
+	thread = rt_current_thread;
+	
+	/*挂起线程*/
+	rt_thread_suspend(thread);
+	
+	/*设置线程定时器的超时时间*/
+	rt_timer_control(&(thread->thread_timer),RT_TIMER_CTRL_SET_TIME,&tick);
+	
+	/*启动定时器*/
+	rt_timer_start(&(thread->thread_timer));
+	
+	/*开中断*/
+	rt_hw_interrupt_enable(temp);
+	
+	/*执行系统调度*/
+	rt_schedule();
+	
+	return RT_EOK;
+}
+
 
 /* rt_thread_delay
  * 阻塞延时函数
  * tick:		要延时的系统节拍
  */
+#if 0
 void rt_thread_delay(rt_tick_t tick)
 {
 	#if 0
@@ -80,6 +157,12 @@ void rt_thread_delay(rt_tick_t tick)
 	rt_schedule();
 	#endif
 }
+#else
+rt_err_t rt_thread_delay(rt_tick_t tick)
+{
+	return rt_thread_sleep(tick);
+}
+#endif
 
 /* rt_thread_self
  * 返回当前运行的线程
@@ -141,5 +224,33 @@ rt_err_t rt_thread_startup(rt_thread_t thread)
 	}
 	return RT_EOK;
 }
+
+/* rt_thread_timeout
+ * 线程超时函数
+ * 当线程延时到期或者等待的资源可用或者超时时,该函数会被调用
+ */
+void rt_thread_timeout(void *parameter)
+{
+	struct rt_thread *thread;
+	
+	thread = (struct rt_thread *)parameter;
+	
+	/* 设置错误码为超时
+	 */
+	thread->error = -RT_ETIMEOUT;
+	
+	/*将线程从挂起列表删除
+	 */
+	rt_list_remove(&(thread->tlist));
+	
+	/* 将线程插入到就绪列表
+	 */
+	rt_schedule_insert_thread(thread);
+	
+	/* 系统调度
+	 */
+	rt_schedule();
+}
+
 
 

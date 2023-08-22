@@ -315,30 +315,6 @@ void rt_timer_check(void)
 	rt_hw_interrupt_enable(level);
 }
 
-/* rt_thread_timeout
- * 线程超时函数
- * 当线程延时到期或者等待的资源可用或者超时时,该函数会被调用
- */
-void rt_thread_timeout(void *parameter)
-{
-	struct rt_thread *thread;
-	
-	thread = (struct rt_thread *)parameter;
-	
-	/* 设置错误码为超时
-	 */
-	thread->error = -RT_ETIMEOUT;
-	
-	/* 将线程从挂起列表中删除
-	 */
-	rt_list_remove(&(thread->tlist));
-	
-	/*将线程插入到就绪列表*/
-	rt_schedule_insert_thread(thread);
-	
-	/*系统调度*/
-	rt_schedule();
-}
 
 
 

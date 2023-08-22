@@ -10,6 +10,7 @@ extern rt_uint32_t rt_thread_ready_priority_group;
 /* rt_tick_increase
  * 系统时基自增
  */
+ #if 0
 void rt_tick_increase(void)
 {
 	rt_ubase_t i;
@@ -43,7 +44,16 @@ void rt_tick_increase(void)
 	/*系统调度*/
 	rt_schedule();
 }
+#else
+void rt_tick_increase(void)
+{
+	++rt_tick;
+	
+	/*扫描系统定时器列表*/
+	rt_timer_check();
+}
 
+#endif
 
 void SysTick_Handler(void)
 {
